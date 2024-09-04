@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <script>
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            navigator.clipboard.writeText(copyText.innerText).then(function() {
+                alert("Copied to clipboard");
+            }, function(err) {
+                console.error("Could not copy text: ", err);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome to the Home Page</h1>
+    
+    {% if user.is_authenticated %}
+        <p>You are logged in as {{ user.username }}.</p>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+
+        {% if access_token %}
+            <h2>Your Access Token:</h2>
+            <p id="accessToken">{{ access_token }}</p>
+            <button onclick="copyToClipboard('accessToken')">Copy Access Token</button>
+        {% else %}
+            <p>No access token available.</p>
+        {% endif %}
+
+    {% else %}
+        <p>You are not logged in.</p>
+        <a href="{% url 'auth0_login' %}"><button>Login</button></a>
+    {% endif %}
+
+    <hr>
+
+    <h2>API Instructions with Curl Commands</h2>
+    
+    <h2>Postman Collection</h2>
+    <p>You can test the API using Postman as well. Click the button below to access the Postman collection:</p>
+    <a href="https://cloudy-eclipse-986458.postman.co/workspace/Toll-Calculator-App~60bf8529-e4bc-4013-ae0f-5f1324dc7aae/collection/23186541-dcadcd82-ee85-46eb-8917-70c0f7a63299?action=share&creator=23186541&active-environment=23186541-ba4e8fe1-e080-4f75-a1be-628f4f9fc390" target="_blank">
+        <button>Open Postman Collection</button>
+    </a>
+    
+    <h3>Example API Endpoints:</h3>
+    <ul>
+        <li>
+            <strong>Add Departments:</strong> 
+            <pre id="1">curl -X POST http://localhost:8000/api/departments/ 
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                -d '{
+                    "name": "Cardiology",
+                    "diagnostics": "Heart-related diagnostics",
+                    "location": "Building A",
+                    "specialization": "Cardiology"
+                }'
+                "</pre>
+            <button onclick="copyToClipboard('1')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>New user Register as doctor</strong> 
+            <pre id="2">curl -X POST http://localhost:8000/api/register/ 
+                -H "Authorization: Bearer " 
+                -H "Content-Type: application/json" 
+                -d '{
+                  "username": "john_doe",
+                  "email": "john_doe@example.com",
+                  "password": "yourpassword",
+                  "is_doctor": true,
+                  "department": 1
+                }'
+                "</pre>
+            <button onclick="copyToClipboard('2')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>New user Register as patient</strong> 
+            <pre id="3">curl -X POST http://localhost:8000/api/register/ 
+                -H "Content-Type: application/json" 
+                -d '{
+                    "username": "patientuser",
+                    "email": "patient@example.com",
+                    "password": "password123",
+                    "is_doctor": false
+                }'
+                "</pre>
+            <button onclick="copyToClipboard('3')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Login user determine role as patient:</strong> 
+            <pre id="4">curl -X POST http://localhost:8000/api/determine_role/ 
+                -H "Authorization: Bearer YOUR_ACCESS_TOKEN" 
+                -H "Content-Type: application/json" 
+                -d '{
+                  "name": "John Doe",
+                  "is_doctor": false
+                }'
+                "</pre>
+            <button onclick="copyToClipboard('4')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Login user determine role as doctor:</strong> 
+            <pre id="5">curl -X POST http://localhost:8000/api/determine_role/ 
+                -H "Content-Type: application/json" 
+                -d '{
+                    "email": "user@example.com",
+                    "is_doctor": true,
+                    "department": 1
+                }'
+                "</pre>
+            <button onclick="copyToClipboard('5')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>List all Departments:</strong> 
+            <pre id="6">curl -X GET http://localhost:8000/api/departments/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json"
+                "</pre>
+            <button onclick="copyToClipboard('6')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>List all Doctors:</strong> 
+            <pre id="7">curl -X GET http://localhost:8000/api/doctors/ 
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                "</pre>
+            <button onclick="copyToClipboard('7')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Get Doctor by Id:</strong> 
+            <pre id="8">curl -X PUT http://localhost:8000/api/doctors/1/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                -d '{
+                      "user": 1,
+                      "department": 2
+                    }'
+                "</pre>
+            <button onclick="copyToClipboard('8')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Update Doctor by Id:</strong> 
+            <pre id="9">curl -X POST http://localhost:8000/api/departments/ 
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                -d '{
+                    "name": "Cardiology",
+                    "diagnostics": "Heart-related diagnostics",
+                    "location": "Building A",
+                    "specialization": "Cardiology"
+                }'
+                "</pre>
+            <button onclick="copyToClipboard('9')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Delete Doctor by Id:</strong> 
+            <pre id="10">curl -X DELETE http://localhost:8000/api/doctors/1/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                "</pre>
+            <button onclick="copyToClipboard('10')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Get List of Patients:</strong> 
+            <pre id="11">curl -X GET http://localhost:8000/api/patients/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                "</pre>
+            <button onclick="copyToClipboard('11')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Update Patient by Id:</strong> 
+            <pre id="12">curl -X PUT http://localhost:8000/api/patients/1/ 
+                -H "Content-Type: application/json" 
+                -d '{
+                      "user": 1,
+                      "address": "New Address"
+                    }'
+                "</pre>
+            <button onclick="copyToClipboard('12')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Get Patient by Id:</strong> 
+            <pre id="13">curl -X GET http://localhost:8000/api/patients/1/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                "</pre>
+            <button onclick="copyToClipboard('13')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Delete Patient by Id:</strong> 
+            <pre id="14">curl -X DELETE http://localhost:8000/api/patients/1/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json"
+                "</pre>
+            <button onclick="copyToClipboard('14')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>Add Patient Records:</strong> 
+            <pre id="15">curl -X POST http://localhost:8000/api/patient_records/add/ 
+                -H "Content-Type: application/json" 
+                -d '{
+                    "patient": 1,
+                    "diagnostics": "General check-up",
+                    "observations": "No critical issues observed",
+                    "treatments": "Follow-up in one month",
+                    "department": 1,
+                    "misc": "No other details"
+                }'
+                "</pre>
+            <button onclick="copyToClipboard('15')">Copy Curl Command</button>
+        </li>
+        <li>
+            <strong>List all Patient Records:</strong> 
+            <pre id="16">curl -X GET http://localhost:8000/api/patient_records/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                "</pre>
+            <button onclick="copyToClipboard('16')">Copy Curl Command</button>
+        </li>
+
+        <li>
+            <strong>Get Patient Record by Id:</strong> 
+            <pre id="17">curl -X GET http://localhost:8000/api/patient_records/1/
+                -H "Authorization: Bearer {{access_token}}" 
+                -H "Content-Type: application/json" 
+                "</pre>
+            <button onclick="copyToClipboard('17')">Copy Curl Command</button>
+        </li>
+        
+    </ul>
+
+</body>
+</html>
